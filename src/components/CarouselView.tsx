@@ -93,96 +93,101 @@ const CarouselView = ({ onBack }: CarouselViewProps) => {
         </div>
       </header>
 
-      {/* Live House Standings */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Card className="bg-white/10 backdrop-blur-sm border-white/20 mb-8">
-          <CardContent className="p-6">
-            <h2 className="text-2xl font-bold text-white mb-6 text-center">Live House Standings</h2>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              {sortedHouses.map((house, index) => (
-                <div 
-                  key={house.name}
-                  className="bg-white/20 backdrop-blur-sm rounded-lg p-4 text-center border border-white/30"
-                >
-                  <div className="flex items-center justify-center mb-2">
-                    {getRankIcon(index)}
-                    <span className="text-white font-semibold ml-2">#{index + 1}</span>
-                  </div>
-                  <h3 className="text-xl font-bold text-white mb-1">{house.name}</h3>
-                  <div className="text-3xl font-bold text-white">{house.score}</div>
-                  <p className="text-white/80 text-sm">points</p>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Event Results Carousel */}
-        <Card className="bg-white/10 backdrop-blur-sm border-white/20">
-          <CardContent className="p-8">
-            <h2 className="text-2xl font-bold text-white mb-6 text-center">Event Results</h2>
-            <Carousel className="w-full max-w-6xl mx-auto" setApi={setApi}>
-              <CarouselContent>
-                {events.map((event) => (
-                  <CarouselItem key={event.id}>
-                    <div className="p-6">
-                      <Card className="bg-white/20 backdrop-blur-sm border-white/30">
-                        <CardContent className="p-8">
-                          <div className="text-center mb-8">
-                            <h3 className="text-3xl font-bold text-white mb-2">{event.name}</h3>
-                            <p className="text-white/80 text-lg">
-                              {new Date(event.date).toLocaleDateString()} • {event.category} • {event.gradeLevel}
-                            </p>
-                          </div>
-                          
-                          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                            {event.winners.map((winner) => (
-                              <div 
-                                key={winner.position}
-                                className="bg-white/20 backdrop-blur-sm rounded-lg p-6 text-center border border-white/30"
-                              >
-                                <div className="flex items-center justify-center mb-6">
-                                  {getPositionIcon(winner.position)}
-                                  <span className="text-white font-bold ml-2 text-xl">
-                                    {winner.position === 1 ? '1st' : winner.position === 2 ? '2nd' : '3rd'} Place
-                                  </span>
-                                </div>
-                                
-                                <div className="mb-6">
-                                  <img 
-                                    src={winner.photo || '/placeholder.svg'} 
-                                    alt={winner.name}
-                                    className="w-48 h-48 object-cover rounded-lg mx-auto mb-6 border-4 border-white/30 shadow-2xl"
-                                    onError={(e) => {
-                                      // Fallback to placeholder if image fails to load
-                                      const target = e.target as HTMLImageElement;
-                                      if (target.src !== '/placeholder.svg') {
-                                        target.src = '/placeholder.svg';
-                                      }
-                                    }}
-                                  />
-                                  <h4 className="text-2xl font-bold text-white mb-3">{winner.name}</h4>
-                                  <div className="flex justify-center mb-3">
-                                    <span className={`px-4 py-2 rounded-full text-lg font-medium ${getHouseColor(winner.house)}`}>
-                                      {winner.house}
-                                    </span>
-                                  </div>
-                                  <div className="text-3xl font-bold text-white">{winner.points} pts</div>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        </CardContent>
-                      </Card>
+      {/* Main Content: Side by Side Layout */}
+      <div className="max-w-7xl mx-auto px-2 sm:px-2 lg:px-4 py-8">
+        <div className="flex flex-col lg:flex-row gap-6 items-start">
+          {/* Live House Standings */}
+          <div className="w-full lg:w-1/5 flex-shrink-0">
+            <Card className="bg-white/10 backdrop-blur-sm border-white/20 h-full">
+              <CardContent className="p-3 lg:p-4">
+                <h2 className="text-2xl font-bold text-white mb-6 text-center">Live House Standings</h2>
+                <div className="flex flex-col gap-4">
+                  {sortedHouses.map((house, index) => (
+                    <div 
+                      key={house.name}
+                      className="bg-white/20 backdrop-blur-sm rounded-lg p-4 text-center border border-white/30"
+                    >
+                      <div className="flex items-center justify-center mb-2">
+                        {getRankIcon(index)}
+                        <span className="text-white font-semibold ml-2">#{index + 1}</span>
+                      </div>
+                      <h3 className="text-xl font-bold text-white mb-1">{house.name}</h3>
+                      <div className="text-3xl font-bold text-white">{house.score}</div>
+                      <p className="text-white/80 text-sm">points</p>
                     </div>
-                  </CarouselItem>
-                ))}
-              </CarouselContent>
-              <CarouselPrevious className="bg-white/20 backdrop-blur-sm border-white/30 text-white hover:bg-white/30" />
-              <CarouselNext className="bg-white/20 backdrop-blur-sm border-white/30 text-white hover:bg-white/30" />
-            </Carousel>
-          </CardContent>
-        </Card>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Event Results Carousel */}
+          <div className="w-full lg:w-4/5 flex-shrink-0">
+            <Card className="bg-white/10 backdrop-blur-sm border-white/20 h-full">
+              <CardContent className="p-2 lg:p-3">
+                <h2 className="text-2xl font-bold text-white mb-6 text-center">Event Results</h2>
+                <Carousel className="w-full" setApi={setApi} opts={{ loop: true }}>
+                  <CarouselContent>
+                    {events.map((event) => (
+                      <CarouselItem key={event.id}>
+                        <div className="p-2 lg:p-4">
+                          <Card className="bg-white/20 backdrop-blur-sm border-white/30">
+                            <CardContent className="p-4 lg:p-6">
+                              <div className="text-center mb-4 lg:mb-8">
+                                <h3 className="text-2xl lg:text-3xl font-bold text-white mb-2">{event.name}</h3>
+                                <p className="text-white/80 text-base lg:text-lg">
+                                  {new Date(event.date).toLocaleDateString()} • {event.category} • {event.gradeLevel}
+                                </p>
+                              </div>
+                              <div className="flex flex-row gap-8 justify-center items-stretch">
+                                {event.winners.map((winner) => (
+                                  <div 
+                                    key={winner.position}
+                                    className="bg-white/20 backdrop-blur-sm rounded-lg p-4 text-center border border-white/30 flex flex-col justify-between flex-1 basis-0 min-w-0"
+                                  >
+                                    <div className="flex items-center justify-center mb-4 lg:mb-6">
+                                      {getPositionIcon(winner.position)}
+                                      <span className="text-white font-bold ml-2 text-lg lg:text-xl">
+                                        {winner.position === 1 ? '1st' : winner.position === 2 ? '2nd' : '3rd'} Place
+                                      </span>
+                                    </div>
+                                    <div className="mb-4 lg:mb-6">
+                                      <img 
+                                        src={winner.photo || '/placeholder.svg'} 
+                                        alt={winner.name}
+                                        className="w-full max-w-xs h-40 lg:h-56 object-cover rounded-lg mx-auto mb-4 lg:mb-6 border-4 border-white/30 shadow-2xl"
+                                        onError={(e) => {
+                                          // Fallback to placeholder if image fails to load
+                                          const target = e.target as HTMLImageElement;
+                                          if (target.src !== '/placeholder.svg') {
+                                            target.src = '/placeholder.svg';
+                                          }
+                                        }}
+                                      />
+                                      <h4 className="text-xl lg:text-2xl font-bold text-white mb-2 lg:mb-3">{winner.name}</h4>
+                                      <div className="flex justify-center mb-2 lg:mb-3">
+                                        <span className={`px-4 py-2 rounded-full text-base lg:text-lg font-medium ${getHouseColor(winner.house)}`}>
+                                          {winner.house}
+                                        </span>
+                                      </div>
+                                      <div className="text-2xl lg:text-3xl font-bold text-white">{winner.points} pts</div>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </CardContent>
+                          </Card>
+                        </div>
+                      </CarouselItem>
+                    ))}
+                  </CarouselContent>
+                  <CarouselPrevious className="bg-white/20 backdrop-blur-sm border-white/30 text-white hover:bg-white/30" />
+                  <CarouselNext className="bg-white/20 backdrop-blur-sm border-white/30 text-white hover:bg-white/30" />
+                </Carousel>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -83,8 +83,7 @@ const AdminLogin = ({ onLogin }: AdminLoginProps) => {
             </Button>
           </form>
           <div className="mt-4 text-center text-sm text-gray-600">
-            <p>Demo credentials:</p>
-            <p>Username: admin | Password: patricks9520</p>
+            <p>Please enter the credentials provided</p>
           </div>
         </CardContent>
       </Card>
