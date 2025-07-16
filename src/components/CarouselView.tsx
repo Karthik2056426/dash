@@ -70,10 +70,10 @@ const CarouselView = ({ onBack }: CarouselViewProps) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
+    <div className="min-h-screen h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 overflow-hidden">
       {/* Header */}
       <header className="bg-black/20 backdrop-blur-sm border-b border-white/10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
           <div className="flex justify-between items-center">
             <div className="flex items-center space-x-4">
               <Button 
@@ -94,20 +94,20 @@ const CarouselView = ({ onBack }: CarouselViewProps) => {
       </header>
 
       {/* Main Content: Side by Side Layout */}
-      <div className="max-w-7xl mx-auto px-2 sm:px-2 lg:px-4 py-8">
-        <div className="flex flex-col lg:flex-row gap-6 items-start">
+      <div className="max-w-7xl mx-auto px-1 sm:px-1 lg:px-2 h-[calc(100vh-60px)] flex flex-col">
+        <div className="flex-1 flex flex-col lg:flex-row gap-4 items-start min-h-0 overflow-hidden">
           {/* Live House Standings */}
-          <div className="w-full lg:w-1/5 flex-shrink-0">
-            <Card className="bg-white/10 backdrop-blur-sm border-white/20 h-full">
-              <CardContent className="p-3 lg:p-4">
-                <h2 className="text-2xl font-bold text-white mb-6 text-center">Live House Standings</h2>
-                <div className="flex flex-col gap-4">
+          <div className="w-full lg:w-1/5 flex-shrink-0 h-full min-h-0">
+            <Card className="bg-white/10 backdrop-blur-sm border-white/20 h-full flex flex-col">
+              <CardContent className="p-2 lg:p-2 flex-1 flex flex-col min-h-0">
+                <h2 className="text-2xl font-bold text-white mb-4 text-center">Live House Standings</h2>
+                <div className="flex flex-col gap-2 flex-1 min-h-0 overflow-auto">
                   {sortedHouses.map((house, index) => (
                     <div 
                       key={house.name}
-                      className="bg-white/20 backdrop-blur-sm rounded-lg p-4 text-center border border-white/30"
+                      className="bg-white/20 backdrop-blur-sm rounded-lg p-2 text-center border border-white/30"
                     >
-                      <div className="flex items-center justify-center mb-2">
+                      <div className="flex items-center justify-center mb-1">
                         {getRankIcon(index)}
                         <span className="text-white font-semibold ml-2">#{index + 1}</span>
                       </div>
@@ -122,40 +122,40 @@ const CarouselView = ({ onBack }: CarouselViewProps) => {
           </div>
 
           {/* Event Results Carousel */}
-          <div className="w-full lg:w-4/5 flex-shrink-0">
-            <Card className="bg-white/10 backdrop-blur-sm border-white/20 h-full">
-              <CardContent className="p-2 lg:p-3">
-                <h2 className="text-2xl font-bold text-white mb-6 text-center">Event Results</h2>
-                <Carousel className="w-full" setApi={setApi} opts={{ loop: true }}>
+          <div className="w-full lg:w-4/5 flex-shrink-0 h-full min-h-0">
+            <Card className="bg-white/10 backdrop-blur-sm border-white/20 h-full flex flex-col">
+              <CardContent className="p-1 lg:p-2 flex-1 flex flex-col min-h-0">
+                <h2 className="text-2xl font-bold text-white mb-4 text-center">Event Results</h2>
+                <Carousel className="w-full h-full" setApi={setApi} opts={{ loop: true }}>
                   <CarouselContent>
                     {events.map((event) => (
                       <CarouselItem key={event.id}>
-                        <div className="p-2 lg:p-4">
-                          <Card className="bg-white/20 backdrop-blur-sm border-white/30">
-                            <CardContent className="p-4 lg:p-6">
-                              <div className="text-center mb-4 lg:mb-8">
-                                <h3 className="text-2xl lg:text-3xl font-bold text-white mb-2">{event.name}</h3>
+                        <div className="p-1 lg:p-2 h-full flex flex-col">
+                          <Card className="bg-white/20 backdrop-blur-sm border-white/30 h-full flex flex-col">
+                            <CardContent className="p-2 lg:p-4 flex-1 flex flex-col min-h-0">
+                              <div className="text-center mb-2 lg:mb-4">
+                                <h3 className="text-2xl lg:text-3xl font-bold text-white mb-1">{event.name}</h3>
                                 <p className="text-white/80 text-base lg:text-lg">
                                   {new Date(event.date).toLocaleDateString()} • {event.category} • {event.gradeLevel}
                                 </p>
                               </div>
-                              <div className="flex flex-row gap-8 justify-center items-stretch">
+                              <div className="flex flex-row gap-4 justify-center items-stretch flex-1 min-h-0 overflow-auto">
                                 {event.winners.map((winner) => (
                                   <div 
                                     key={winner.position}
-                                    className="bg-white/20 backdrop-blur-sm rounded-lg p-4 text-center border border-white/30 flex flex-col justify-between flex-1 basis-0 min-w-0"
+                                    className="bg-white/20 backdrop-blur-sm rounded-lg p-2 text-center border border-white/30 flex flex-col justify-between flex-1 basis-0 min-w-0"
                                   >
-                                    <div className="flex items-center justify-center mb-4 lg:mb-6">
+                                    <div className="flex items-center justify-center mb-2 lg:mb-3">
                                       {getPositionIcon(winner.position)}
                                       <span className="text-white font-bold ml-2 text-lg lg:text-xl">
                                         {winner.position === 1 ? '1st' : winner.position === 2 ? '2nd' : '3rd'} Place
                                       </span>
                                     </div>
-                                    <div className="mb-4 lg:mb-6">
+                                    <div className="mb-2 lg:mb-3">
                                       <img 
                                         src={winner.photo || '/placeholder.svg'} 
                                         alt={winner.name}
-                                        className="w-full max-w-xs h-40 lg:h-56 object-cover rounded-lg mx-auto mb-4 lg:mb-6 border-4 border-white/30 shadow-2xl"
+                                        className="w-full max-w-xs h-32 lg:h-44 object-cover rounded-lg mx-auto mb-2 lg:mb-3 border-4 border-white/30 shadow-2xl"
                                         onError={(e) => {
                                           // Fallback to placeholder if image fails to load
                                           const target = e.target as HTMLImageElement;
@@ -164,8 +164,8 @@ const CarouselView = ({ onBack }: CarouselViewProps) => {
                                           }
                                         }}
                                       />
-                                      <h4 className="text-xl lg:text-2xl font-bold text-white mb-2 lg:mb-3">{winner.name}</h4>
-                                      <div className="flex justify-center mb-2 lg:mb-3">
+                                      <h4 className="text-xl lg:text-2xl font-bold text-white mb-1 lg:mb-2">{winner.name}</h4>
+                                      <div className="flex justify-center mb-1 lg:mb-2">
                                         <span className={`px-4 py-2 rounded-full text-base lg:text-lg font-medium ${getHouseColor(winner.house)}`}>
                                           {winner.house}
                                         </span>
