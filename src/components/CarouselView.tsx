@@ -174,13 +174,13 @@ const CarouselView = ({ onBack }: CarouselViewProps) => {
                             {school.rank}
                           </div>
                           <div className="min-w-0">
-                            <div className="text-white font-semibold text-sm">
+                            <div className="text-white font-semibold text-xl">
                               {school.name}
                             </div>
                           </div>
                         </div>
                         <div className="text-right">
-                          <div className="text-sky-300 text-lg font-bold">{school.score}</div>
+                          <div className="text-sky-300 text-2xl font-bold">{school.score}</div>
                           <div className="text-white/60 text-xs">pts</div>
                         </div>
                       </div>
@@ -202,13 +202,13 @@ const CarouselView = ({ onBack }: CarouselViewProps) => {
                           {school.rank}
                         </div>
                         <div className="min-w-0">
-                          <div className="text-white font-semibold text-sm">
+                          <div className="text-white font-semibold text-lg">
                             {school.name}
                           </div>
                         </div>
                       </div>
                       <div className="text-right">
-                        <div className="text-sky-300 text-lg font-bold">{school.score}</div>
+                        <div className="text-sky-300 text-2xl font-bold">{school.score}</div>
                         <div className="text-white/60 text-xs">pts</div>
                       </div>
                     </div>
@@ -223,13 +223,13 @@ const CarouselView = ({ onBack }: CarouselViewProps) => {
                           {school.rank}
                         </div>
                         <div className="min-w-0">
-                          <div className="text-white font-semibold text-sm">
+                          <div className="text-white font-semibold text-lg">
                             {school.name}
                           </div>
                         </div>
                       </div>
                       <div className="text-right">
-                        <div className="text-sky-300 text-lg font-bold">{school.score}</div>
+                        <div className="text-sky-300 text-2xl font-bold">{school.score}</div>
                         <div className="text-white/60 text-xs">pts</div>
                       </div>
                     </div>
