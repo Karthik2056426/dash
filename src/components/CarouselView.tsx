@@ -135,42 +135,108 @@ const CarouselView = ({ onBack }: CarouselViewProps) => {
   const topWinners = latestEvent ? [...latestEvent.winners].sort((a, b) => a.position - b.position).slice(0, 3) : [];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 relative">
+    <>
+      <style jsx>{`
+        @keyframes scroll {
+          0% {
+            transform: translateY(0);
+          }
+          100% {
+            transform: translateY(-50%);
+          }
+        }
+        .animate-scroll {
+          animation: scroll 20s linear infinite;
+        }
+      `}</style>
+      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 relative">
       {/* Main Content - Split Layout */}
       <div className="flex h-screen">
         {/* Left Sidebar - School Standings (65%) */}
-        <div className="w-[65%] bg-black/10 backdrop-blur-sm border-r border-white/10 p-4 overflow-y-auto">
-          <div className="space-y-3">
-            {schoolsWithRanks.map((school) => {
-              const borderGradient = school.rank === 1
-                ? 'from-yellow-400 via-yellow-300 to-yellow-500'
-                : school.rank === 2
-                ? 'from-sky-400 via-indigo-400 to-sky-500'
-                : school.rank === 3
-                ? 'from-fuchsia-500 via-purple-500 to-orange-400'
-                : 'from-slate-600 to-slate-700';
-              return (
-                <div key={school.name} className={`rounded-xl p-[2px] bg-gradient-to-r ${borderGradient}`}>
-                  <div className="rounded-[10px] bg-black/40 px-4 py-3 flex items-center justify-between">
-                    <div className="flex items-center gap-3 min-w-0">
-                      <div className="h-8 w-8 rounded-full bg-white/10 flex items-center justify-center text-white font-bold text-sm shrink-0">
-                        {school.rank}
-                      </div>
-                      <div className="min-w-0">
-                        <div className="text-white font-semibold truncate">
-                          {school.name.length > 28 ? `${school.name.substring(0, 28)}...` : school.name}
+        <div className="w-[65%] bg-black/10 backdrop-blur-sm border-r border-white/10 p-4 flex flex-col">
+          {/* Top 3 Ranks - Static (only show if they have scores) */}
+          {schoolsWithRanks.filter(school => school.score > 0).length > 0 && (
+            <div className="space-y-1 mb-4">
+              {schoolsWithRanks
+                .filter(school => school.score > 0)
+                .slice(0, 3)
+                .map((school) => {
+                  const borderGradient = school.rank === 1
+                    ? 'from-yellow-400 via-yellow-300 to-yellow-500'
+                    : school.rank === 2
+                    ? 'from-sky-400 via-indigo-400 to-sky-500'
+                    : 'from-fuchsia-500 via-purple-500 to-orange-400';
+                  return (
+                    <div key={school.name} className={`rounded-xl p-[2px] bg-gradient-to-r ${borderGradient}`}>
+                      <div className="rounded-[10px] bg-black/40 px-3 py-2 flex items-center justify-between">
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className="h-6 w-6 rounded-full bg-white/10 flex items-center justify-center text-white font-bold text-xs shrink-0">
+                            {school.rank}
+                          </div>
+                          <div className="min-w-0">
+                            <div className="text-white font-semibold text-sm">
+                              {school.name}
+                            </div>
+                          </div>
                         </div>
-                        <div className="text-white/60 text-xs">School</div>
+                        <div className="text-right">
+                          <div className="text-sky-300 text-lg font-bold">{school.score}</div>
+                          <div className="text-white/60 text-xs">pts</div>
+                        </div>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <div className="text-sky-300 text-2xl font-bold">{school.score}</div>
-                      <div className="text-white/60 text-xs">points</div>
+                  );
+                })}
+            </div>
+          )}
+
+          {/* All Schools - Vertical Carousel */}
+          <div className="flex-1 relative overflow-hidden">
+            <div className="absolute inset-0">
+              <div className="space-y-1 animate-scroll">
+                {schoolsWithRanks.map((school) => (
+                  <div key={school.name} className="rounded-xl p-[2px] bg-gradient-to-r from-slate-600 to-slate-700">
+                    <div className="rounded-[10px] bg-black/40 px-3 py-2 flex items-center justify-between">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="h-6 w-6 rounded-full bg-white/10 flex items-center justify-center text-white font-bold text-xs shrink-0">
+                          {school.rank}
+                        </div>
+                        <div className="min-w-0">
+                          <div className="text-white font-semibold text-sm">
+                            {school.name}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-sky-300 text-lg font-bold">{school.score}</div>
+                        <div className="text-white/60 text-xs">pts</div>
+                      </div>
                     </div>
                   </div>
-                </div>
-              );
-            })}
+                ))}
+                {/* Duplicate for seamless loop */}
+                {schoolsWithRanks.map((school) => (
+                  <div key={`${school.name}-duplicate`} className="rounded-xl p-[2px] bg-gradient-to-r from-slate-600 to-slate-700">
+                    <div className="rounded-[10px] bg-black/40 px-3 py-2 flex items-center justify-between">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="h-6 w-6 rounded-full bg-white/10 flex items-center justify-center text-white font-bold text-xs shrink-0">
+                          {school.rank}
+                        </div>
+                        <div className="min-w-0">
+                          <div className="text-white font-semibold text-sm">
+                            {school.name}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-sky-300 text-lg font-bold">{school.score}</div>
+                        <div className="text-white/60 text-xs">pts</div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
 
@@ -182,7 +248,7 @@ const CarouselView = ({ onBack }: CarouselViewProps) => {
               <img 
                 src="/colablogo.png" 
                 alt="Colab Logo" 
-                className="h-24 w-auto opacity-80"
+                className="h-32 w-auto opacity-80"
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;
                   target.style.display = 'none';
@@ -273,7 +339,8 @@ const CarouselView = ({ onBack }: CarouselViewProps) => {
         <ArrowLeft className="h-5 w-5 mr-2" />
         Back
       </Button>
-    </div>
+      </div>
+    </>
   );
 };
 
