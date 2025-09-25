@@ -31,18 +31,6 @@ const Index = () => {
 
   // Calculate stats
   const totalEvents = events.length;
-  // Participants: count unique winner names across all events
-  const participants = Array.from(new Set(events.flatMap(e => e.winners.map(w => w.name)))).length;
-  // Awards: total number of winner entries
-  const awards = events.reduce((sum, e) => sum + e.winners.length, 0);
-  // Avg Score per school
-  const schoolScores: Record<string, number> = {};
-  events.forEach(e => {
-    e.winners.forEach(w => {
-      schoolScores[w.school] = (schoolScores[w.school] || 0) + w.points;
-    });
-  });
-  const avgScore = Object.values(schoolScores).length > 0 ? Math.round(Object.values(schoolScores).reduce((a, b) => a + b, 0) / Object.values(schoolScores).length) : 0;
 
   const handleAdminClick = () => {
     if (isAuthenticated) {
@@ -178,8 +166,8 @@ const Index = () => {
         <EventResults />
         
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <Card className="bg-gradient-to-br from-red-500 to-red-600 text-white">
+        <div className="flex justify-center">
+          <Card className="bg-gradient-to-br from-red-500 to-red-600 text-white w-full max-w-sm">
             <CardHeader className="pb-2">
               <CardTitle className="text-lg flex items-center space-x-2">
                 <Calendar className="h-5 w-5" />
@@ -189,45 +177,6 @@ const Index = () => {
             <CardContent>
               <div className="text-3xl font-bold">{totalEvents}</div>
               <p className="text-red-100">This semester</p>
-            </CardContent>
-          </Card>
-          
-          <Card className="bg-gradient-to-br from-blue-500 to-blue-600 text-white">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg flex items-center space-x-2">
-                <Users className="h-5 w-5" />
-                <span>Participants</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold">{participants}</div>
-              <p className="text-blue-100">Active students</p>
-            </CardContent>
-          </Card>
-          
-          <Card className="bg-gradient-to-br from-green-500 to-green-600 text-white">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg flex items-center space-x-2">
-                <Award className="h-5 w-5" />
-                <span>Awards</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold">{awards}</div>
-              <p className="text-green-100">Given out</p>
-            </CardContent>
-          </Card>
-          
-          <Card className="bg-gradient-to-br from-purple-500 to-purple-600 text-white">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg flex items-center space-x-2">
-                <BarChart3 className="h-5 w-5" />
-                <span>Avg Score</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold">{avgScore}</div>
-              <p className="text-purple-100">Per house</p>
             </CardContent>
           </Card>
         </div>
