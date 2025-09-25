@@ -151,9 +151,9 @@ const CarouselView = ({ onBack }: CarouselViewProps) => {
       `}</style>
       <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 relative">
       {/* Main Content - Split Layout */}
-      <div className="flex h-screen">
+      <div className="flex flex-col lg:flex-row h-screen">
         {/* Left Sidebar - School Standings (65%) */}
-        <div className="w-[65%] bg-black/10 backdrop-blur-sm border-r border-white/10 p-4 flex flex-col">
+        <div className="w-full lg:w-[65%] bg-black/10 backdrop-blur-sm border-r border-white/10 p-2 sm:p-4 flex flex-col">
           {/* Top 3 Ranks - Static (only show if they have scores) */}
           {schoolsWithRanks.filter(school => school.score > 0).length > 0 && (
             <div className="space-y-1 mb-4">
@@ -241,7 +241,7 @@ const CarouselView = ({ onBack }: CarouselViewProps) => {
         </div>
 
         {/* Right Panel - Top Winners (35%) */}
-        <div className="w-[35%] bg-black/5 backdrop-blur-sm p-4">
+        <div className="w-full lg:w-[35%] bg-black/5 backdrop-blur-sm p-2 sm:p-4">
           <div className="h-full flex flex-col relative">
             {/* Logo images at the top */}
             <div className="flex justify-between items-center mb-4">

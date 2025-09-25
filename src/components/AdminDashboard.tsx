@@ -332,15 +332,17 @@ const AdminDashboard = ({ onBack }: AdminDashboardProps) => {
       <header className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <Button variant="ghost" onClick={onBack} className="flex items-center space-x-2">
+            <div className="flex items-center space-x-2 sm:space-x-4">
+              <Button variant="ghost" onClick={onBack} className="flex items-center space-x-1 sm:space-x-2">
                 <ArrowLeft className="h-4 w-4" />
-                <span>Back to Public View</span>
+                <span className="hidden sm:inline">Back to Public View</span>
+                <span className="sm:hidden">Back</span>
               </Button>
-              <div className="h-6 w-px bg-gray-300" />
-              <h1 className="text-2xl font-bold text-gray-900 flex items-center space-x-2">
-                <Settings className="h-6 w-6 text-blue-600" />
-                <span>Admin Dashboard</span>
+              <div className="h-6 w-px bg-gray-300 hidden sm:block" />
+              <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 flex items-center space-x-2">
+                <Settings className="h-5 w-5 sm:h-6 sm:w-6 text-blue-600" />
+                <span className="hidden sm:inline">Admin Dashboard</span>
+                <span className="sm:hidden">Admin</span>
               </h1>
             </div>
           </div>
@@ -348,9 +350,9 @@ const AdminDashboard = ({ onBack }: AdminDashboardProps) => {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-3 mb-8">
+          <TabsList className="grid w-full grid-cols-1 sm:grid-cols-3 mb-4 sm:mb-8">
             <TabsTrigger value="events" className="flex items-center space-x-2">
               <Calendar className="h-4 w-4" />
               <span>Events</span>

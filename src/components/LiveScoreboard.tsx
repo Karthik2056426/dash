@@ -97,9 +97,9 @@ const LiveScoreboard = () => {
         </CardDescription>
       </CardHeader>
       <CardContent className="p-6">
-        <div className="space-y-6">
+        <div className="space-y-4 sm:space-y-6">
           {/* First Row - 10 Schools */}
-          <div className="grid grid-cols-2 md:grid-cols-5 lg:grid-cols-10 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-10 gap-2 sm:gap-3">
             {schoolsWithRanks.slice(0, 10).map((school, index) => (
               <div 
                 key={school.name}
@@ -110,7 +110,7 @@ const LiveScoreboard = () => {
                     {getRankIcon(index)}
                     <span className="ml-1 text-xs font-bold text-gray-600">#{school.rank}</span>
                   </div>
-                  <h3 className="text-xs font-bold text-gray-800 leading-tight mb-1">{school.name}</h3>
+                  <h3 className="text-xs font-bold text-gray-800 leading-tight mb-1" style={{ display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{school.name}</h3>
                   <div className="text-lg font-bold text-gray-900">{school.score}</div>
                   <div className="text-xs text-gray-500">points</div>
                 </div>
@@ -125,7 +125,7 @@ const LiveScoreboard = () => {
           </div>
 
           {/* Second Row - 9 Schools */}
-          <div className="grid grid-cols-2 md:grid-cols-5 lg:grid-cols-9 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-9 gap-2 sm:gap-3">
             {schoolsWithRanks.slice(10, 19).map((school, index) => (
               <div 
                 key={school.name}
@@ -136,7 +136,7 @@ const LiveScoreboard = () => {
                     {getRankIcon(index + 10)}
                     <span className="ml-1 text-xs font-bold text-gray-600">#{school.rank}</span>
                   </div>
-                  <h3 className="text-xs font-bold text-gray-800 leading-tight mb-1">{school.name}</h3>
+                  <h3 className="text-xs font-bold text-gray-800 leading-tight mb-1" style={{ display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{school.name}</h3>
                   <div className="text-lg font-bold text-gray-900">{school.score}</div>
                   <div className="text-xs text-gray-500">points</div>
                 </div>
