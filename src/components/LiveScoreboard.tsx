@@ -24,7 +24,7 @@ const LiveScoreboard = () => {
     'DON BOSCO CENTRAL SCHOOL ALUVA': { name: 'DON BOSCO CENTRAL SCHOOL ALUVA', color: 'yellow', score: 0, bgGradient: 'from-yellow-500 to-yellow-600' },
     'AUXILIUM SCHOOL KIDANGOOR, ANGAMALY': { name: 'AUXILIUM SCHOOL KIDANGOOR, ANGAMALY', color: 'purple', score: 0, bgGradient: 'from-purple-500 to-purple-600' },
     'DON BOSCO SENIOR SECONDARY SCHOOL VADUTHALA': { name: 'DON BOSCO SENIOR SECONDARY SCHOOL VADUTHALA', color: 'indigo', score: 0, bgGradient: 'from-indigo-500 to-indigo-600' },
-    'MAIRAM THRESIA PUBLIC SCHOOL': { name: 'MAIRAM THRESIA PUBLIC SCHOOL', color: 'pink', score: 0, bgGradient: 'from-pink-500 to-pink-600' },
+    'MARIAM THRESIA PUBLIC SCHOOL': { name: 'MARIAM THRESIA PUBLIC SCHOOL', color: 'pink', score: 0, bgGradient: 'from-pink-500 to-pink-600' },
     'VIMALA CENTRAL SCHOOL PERUMBAVOOR': { name: 'VIMALA CENTRAL SCHOOL PERUMBAVOOR', color: 'orange', score: 0, bgGradient: 'from-orange-500 to-orange-600' },
     'CHAVARA INTERNATIONAL VAZHAKULAM': { name: 'CHAVARA INTERNATIONAL VAZHAKULAM', color: 'teal', score: 0, bgGradient: 'from-teal-500 to-teal-600' },
     'ANITA PUBLIC SCHOOL THANNIPUZHA': { name: 'ANITA PUBLIC SCHOOL THANNIPUZHA', color: 'cyan', score: 0, bgGradient: 'from-cyan-500 to-cyan-600' },
@@ -40,16 +40,32 @@ const LiveScoreboard = () => {
   };
   events.forEach((event: any) => {
     event.winners?.forEach((winner: any) => {
-      if (schoolMap[winner.house]) {
-        schoolMap[winner.house].score += winner.points;
+      if (schoolMap[winner.school]) {
+        schoolMap[winner.school].score += winner.points;
       }
     });
   });
   const schools = Object.values(schoolMap);
-  // Filter out schools with zero points and sort by score
-  const schoolsWithPoints = schools.filter(school => school.score > 0);
-  const maxScore = Math.max(...schoolsWithPoints.map(h => h.score), 1);
-  const sortedSchools = [...schoolsWithPoints].sort((a, b) => b.score - a.score);
+  // Sort all schools by score (including those with 0 points)
+  const sortedSchools = [...schools].sort((a, b) => b.score - a.score);
+  
+  // Calculate ranks with proper tie handling - dense ranking (1,1,2,3)
+  const schoolsWithRanks = [] as Array<{ name: string; color: string; score: number; bgGradient: string; rank: number }>;
+  let currentRank = 1;
+  
+  for (let i = 0; i < sortedSchools.length; i++) {
+    const school = sortedSchools[i];
+    
+    // If this is not the first school and has different score than previous, increment rank
+    if (i > 0 && school.score !== sortedSchools[i - 1].score) {
+      currentRank = i + 1;
+    }
+    
+    schoolsWithRanks.push({
+      ...school,
+      rank: currentRank
+    });
+  }
 
   const getRankIcon = (index: number) => {
     switch (index) {
@@ -81,42 +97,53 @@ const LiveScoreboard = () => {
         </CardDescription>
       </CardHeader>
       <CardContent className="p-6">
-        {sortedSchools.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {sortedSchools.map((school, index) => (
-            <div 
-              key={school.name}
-              className={`relative p-4 rounded-xl border-2 transition-all duration-300 hover:scale-105 ${getRankColor(index)}`}
-            >
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center space-x-2">
-                  {getRankIcon(index)}
-                  <div>
-                    <h3 className="text-sm font-bold text-gray-800 leading-tight">{school.name}</h3>
-                    <p className="text-xs text-gray-500">#{index + 1} Position</p>
+        <div className="space-y-6">
+          {/* First Row - 10 Schools */}
+          <div className="grid grid-cols-2 md:grid-cols-5 lg:grid-cols-10 gap-3">
+            {schoolsWithRanks.slice(0, 10).map((school, index) => (
+              <div 
+                key={school.name}
+                className={`relative p-3 rounded-lg border-2 transition-all duration-300 hover:scale-105 ${getRankColor(index)}`}
+              >
+                <div className="text-center">
+                  <div className="flex items-center justify-center mb-2">
+                    {getRankIcon(index)}
+                    <span className="ml-1 text-xs font-bold text-gray-600">#{school.rank}</span>
                   </div>
+                  <h3 className="text-xs font-bold text-gray-800 leading-tight mb-1">{school.name}</h3>
+                  <div className="text-lg font-bold text-gray-900">{school.score}</div>
+                  <div className="text-xs text-gray-500">points</div>
                 </div>
-                <div className="text-right">
-                  <div className="text-2xl font-bold text-gray-900">{school.score}</div>
+                
+                {index === 0 && school.score > 0 && (
+                  <div className="absolute -top-1 -right-1 bg-yellow-400 text-yellow-900 px-2 py-1 rounded-full text-xs font-bold animate-pulse">
+                    LEADING
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* Second Row - 9 Schools */}
+          <div className="grid grid-cols-2 md:grid-cols-5 lg:grid-cols-9 gap-3">
+            {schoolsWithRanks.slice(10, 19).map((school, index) => (
+              <div 
+                key={school.name}
+                className={`relative p-3 rounded-lg border-2 transition-all duration-300 hover:scale-105 ${getRankColor(index + 10)}`}
+              >
+                <div className="text-center">
+                  <div className="flex items-center justify-center mb-2">
+                    {getRankIcon(index + 10)}
+                    <span className="ml-1 text-xs font-bold text-gray-600">#{school.rank}</span>
+                  </div>
+                  <h3 className="text-xs font-bold text-gray-800 leading-tight mb-1">{school.name}</h3>
+                  <div className="text-lg font-bold text-gray-900">{school.score}</div>
                   <div className="text-xs text-gray-500">points</div>
                 </div>
               </div>
-              
-              
-              {index === 0 && (
-                <div className="absolute -top-2 -right-2 bg-yellow-400 text-yellow-900 px-3 py-1 rounded-full text-xs font-bold animate-pulse">
-                  LEADING
-                </div>
-              )}
-            </div>
-          ))}
+            ))}
           </div>
-        ) : (
-          <div className="text-center py-8">
-            <p className="text-gray-600 text-lg">No schools have scored points yet.</p>
-            <p className="text-gray-500 text-sm mt-2">Add event results to see school standings.</p>
-          </div>
-        )}
+        </div>
       </CardContent>
     </Card>
   );
