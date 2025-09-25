@@ -6,7 +6,7 @@ import { collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot } from 'fireb
 // Types
 export interface Winner {
   position: number;
-  house: string;
+  school: string;
   name: string;
   points: number;
   photo?: string; // base64 or url
@@ -20,6 +20,7 @@ export interface Event {
   category: string;
   gradeLevel: string;
   venue: string;
+  chestNumber: string;
   winners: Winner[];
 }
 

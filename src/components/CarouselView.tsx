@@ -11,44 +11,104 @@ interface CarouselViewProps {
 
 const CarouselView = ({ onBack }: CarouselViewProps) => {
   const { events } = useEventContext();
-  // Calculate house scores from all event winners
-  const houseMap: Record<string, { name: string; color: string; score: number; bgGradient: string }> = {
-    Delany: { name: 'Delany', color: 'red', score: 0, bgGradient: 'from-red-500 to-red-600' },
-    Gandhi: { name: 'Gandhi', color: 'blue', score: 0, bgGradient: 'from-blue-500 to-blue-600' },
-    Tagore: { name: 'Tagore', color: 'green', score: 0, bgGradient: 'from-green-500 to-green-600' },
-    Aloysius: { name: 'Aloysius', color: 'yellow', score: 0, bgGradient: 'from-yellow-500 to-yellow-600' },
+  
+  // Debug: Log events to console
+  console.log('CarouselView - Events:', events);
+  console.log('CarouselView - Events length:', events.length);
+  // Calculate school scores from all event winners
+  const schoolMap: Record<string, { name: string; color: string; score: number; bgGradient: string }> = {
+    'OUR LADY OF MERCY SCHOOL': { name: 'OUR LADY OF MERCY SCHOOL', color: 'red', score: 0, bgGradient: 'from-red-500 to-red-600' },
+    'KRISTUJYOTHI INTERNATIONAL SCHOOL': { name: 'KRISTUJYOTHI INTERNATIONAL SCHOOL', color: 'blue', score: 0, bgGradient: 'from-blue-500 to-blue-600' },
+    'JEEVAS CMI CENTRAL SCHOOL ALUVA': { name: 'JEEVAS CMI CENTRAL SCHOOL ALUVA', color: 'green', score: 0, bgGradient: 'from-green-500 to-green-600' },
+    'DON BOSCO CENTRAL SCHOOL ALUVA': { name: 'DON BOSCO CENTRAL SCHOOL ALUVA', color: 'yellow', score: 0, bgGradient: 'from-yellow-500 to-yellow-600' },
+    'AUXILIUM SCHOOL KIDANGOOR, ANGAMALY': { name: 'AUXILIUM SCHOOL KIDANGOOR, ANGAMALY', color: 'purple', score: 0, bgGradient: 'from-purple-500 to-purple-600' },
+    'DON BOSCO SENIOR SECONDARY SCHOOL VADUTHALA': { name: 'DON BOSCO SENIOR SECONDARY SCHOOL VADUTHALA', color: 'indigo', score: 0, bgGradient: 'from-indigo-500 to-indigo-600' },
+    'MAIRAM THRESIA PUBLIC SCHOOL': { name: 'MAIRAM THRESIA PUBLIC SCHOOL', color: 'pink', score: 0, bgGradient: 'from-pink-500 to-pink-600' },
+    'VIMALA CENTRAL SCHOOL PERUMBAVOOR': { name: 'VIMALA CENTRAL SCHOOL PERUMBAVOOR', color: 'orange', score: 0, bgGradient: 'from-orange-500 to-orange-600' },
+    'CHAVARA INTERNATIONAL VAZHAKULAM': { name: 'CHAVARA INTERNATIONAL VAZHAKULAM', color: 'teal', score: 0, bgGradient: 'from-teal-500 to-teal-600' },
+    'ANITA PUBLIC SCHOOL THANNIPUZHA': { name: 'ANITA PUBLIC SCHOOL THANNIPUZHA', color: 'cyan', score: 0, bgGradient: 'from-cyan-500 to-cyan-600' },
+    'SEVENTH DAY ADVENTIST HIGHER SECONDARY SCHOOL KALOOR': { name: 'SEVENTH DAY ADVENTIST HIGHER SECONDARY SCHOOL KALOOR', color: 'emerald', score: 0, bgGradient: 'from-emerald-500 to-emerald-600' },
+    'VIMALAGIRI INTERNATIONAL SCHOOL MUVATTUPUZHA': { name: 'VIMALAGIRI INTERNATIONAL SCHOOL MUVATTUPUZHA', color: 'lime', score: 0, bgGradient: 'from-lime-500 to-lime-600' },
+    'SANTHOME CENTRAL SCHOOL MOOKKANNOOR': { name: 'SANTHOME CENTRAL SCHOOL MOOKKANNOOR', color: 'amber', score: 0, bgGradient: 'from-amber-500 to-amber-600' },
+    'MARY WARD ENGLISH MEDIUM SCHOOL': { name: 'MARY WARD ENGLISH MEDIUM SCHOOL', color: 'rose', score: 0, bgGradient: 'from-rose-500 to-rose-600' },
+    'MAR ATHANASIUS INTERNATIONAL SCHOOL KOTHAMANGALAM': { name: 'MAR ATHANASIUS INTERNATIONAL SCHOOL KOTHAMANGALAM', color: 'violet', score: 0, bgGradient: 'from-violet-500 to-violet-600' },
+    'VIDYA VIKAS SCHOOL': { name: 'VIDYA VIKAS SCHOOL', color: 'fuchsia', score: 0, bgGradient: 'from-fuchsia-500 to-fuchsia-600' },
+    'JNANODAYA CENTRAL SCHOOL': { name: 'JNANODAYA CENTRAL SCHOOL', color: 'sky', score: 0, bgGradient: 'from-sky-500 to-sky-600' },
+    'AUXILIUM ENGLISH MEDIUM SCHOOL': { name: 'AUXILIUM ENGLISH MEDIUM SCHOOL', color: 'slate', score: 0, bgGradient: 'from-slate-500 to-slate-600' },
+    'ST. PATRICKS ACADEMY': { name: 'ST. PATRICKS ACADEMY', color: 'stone', score: 0, bgGradient: 'from-stone-500 to-stone-600' },
   };
   events.forEach(event => {
     event.winners.forEach(winner => {
-      if (houseMap[winner.house]) {
-        houseMap[winner.house].score += winner.points;
+      if (schoolMap[winner.school]) {
+        schoolMap[winner.school].score += winner.points;
       }
     });
   });
-  const houses = Object.values(houseMap);
-  const sortedHouses = [...houses].sort((a, b) => b.score - a.score);
-  // Use events from context for the event carousel
+  const schools = Object.values(schoolMap);
+  // Sort all schools by score (including those with 0 points)
+  const sortedSchools = [...schools].sort((a, b) => b.score - a.score);
+
+  // Calculate ranks with proper tie handling - dense ranking (1,1,2,3)
+  const schoolsWithRanks = [] as Array<{ name: string; color: string; score: number; bgGradient: string; rank: number }>;
+  let lastScore: number | undefined = undefined;
+  let lastRank = 0;
+
+  for (let i = 0; i < sortedSchools.length; i++) {
+    const school = sortedSchools[i];
+
+    if (lastScore === undefined) {
+      // First item
+      lastRank = 1;
+      lastScore = school.score;
+    } else if (school.score !== lastScore) {
+      // New distinct score → increment rank by 1 (dense ranking)
+      lastRank += 1;
+      lastScore = school.score;
+    }
+
+    schoolsWithRanks.push({
+      ...school,
+      rank: lastRank,
+    });
+  }
+
+  // Use events from context for the event carousel / latest winners panel
   const [api, setApi] = useState<CarouselApi>();
 
-  // Auto-rotation effect
+  // Auto-rotation enabled for event details
   useEffect(() => {
     if (!api) return;
 
     const interval = setInterval(() => {
       api.scrollNext();
-    }, 5000); // 5 seconds
+    }, 4000); // 4 seconds per slide
 
     return () => clearInterval(interval);
   }, [api]);
 
-  const getHouseColor = (house: string) => {
+  const getSchoolColor = (school: string) => {
     const colors = {
-      'Delany': 'bg-red-100 text-red-800 border-red-200',
-      'Gandhi': 'bg-blue-100 text-blue-800 border-blue-200',
-      'Tagore': 'bg-green-100 text-green-800 border-green-200',
-      'Aloysius': 'bg-yellow-100 text-yellow-800 border-yellow-200'
+      'OUR LADY OF MERCY SCHOOL': 'bg-red-100 text-red-800 border-red-200',
+      'KRISTUJYOTHI INTERNATIONAL SCHOOL': 'bg-blue-100 text-blue-800 border-blue-200',
+      'JEEVAS CMI CENTRAL SCHOOL ALUVA': 'bg-green-100 text-green-800 border-green-200',
+      'DON BOSCO CENTRAL SCHOOL ALUVA': 'bg-yellow-100 text-yellow-800 border-yellow-200',
+      'AUXILIUM SCHOOL KIDANGOOR, ANGAMALY': 'bg-purple-100 text-purple-800 border-purple-200',
+      'DON BOSCO SENIOR SECONDARY SCHOOL VADUTHALA': 'bg-indigo-100 text-indigo-800 border-indigo-200',
+      'MAIRAM THRESIA PUBLIC SCHOOL': 'bg-pink-100 text-pink-800 border-pink-200',
+      'VIMALA CENTRAL SCHOOL PERUMBAVOOR': 'bg-orange-100 text-orange-800 border-orange-200',
+      'CHAVARA INTERNATIONAL VAZHAKULAM': 'bg-teal-100 text-teal-800 border-teal-200',
+      'ANITA PUBLIC SCHOOL THANNIPUZHA': 'bg-cyan-100 text-cyan-800 border-cyan-200',
+      'SEVENTH DAY ADVENTIST HIGHER SECONDARY SCHOOL KALOOR': 'bg-emerald-100 text-emerald-800 border-emerald-200',
+      'VIMALAGIRI INTERNATIONAL SCHOOL MUVATTUPUZHA': 'bg-lime-100 text-lime-800 border-lime-200',
+      'SANTHOME CENTRAL SCHOOL MOOKKANNOOR': 'bg-amber-100 text-amber-800 border-amber-200',
+      'MARY WARD ENGLISH MEDIUM SCHOOL': 'bg-rose-100 text-rose-800 border-rose-200',
+      'MAR ATHANASIUS INTERNATIONAL SCHOOL KOTHAMANGALAM': 'bg-violet-100 text-violet-800 border-violet-200',
+      'VIDYA VIKAS SCHOOL': 'bg-fuchsia-100 text-fuchsia-800 border-fuchsia-200',
+      'JNANODAYA CENTRAL SCHOOL': 'bg-sky-100 text-sky-800 border-sky-200',
+      'AUXILIUM ENGLISH MEDIUM SCHOOL': 'bg-slate-100 text-slate-800 border-slate-200',
+      'ST. PATRICKS ACADEMY': 'bg-stone-100 text-stone-800 border-stone-200'
     };
-    return colors[house as keyof typeof colors] || 'bg-gray-100 text-gray-800';
+    return colors[school as keyof typeof colors] || 'bg-gray-100 text-gray-800';
   };
 
   const getPositionIcon = (position: number) => {
@@ -56,6 +116,7 @@ const CarouselView = ({ onBack }: CarouselViewProps) => {
       case 1: return <Trophy className="h-5 w-5 text-yellow-500" />;
       case 2: return <Medal className="h-5 w-5 text-gray-400" />;
       case 3: return <Award className="h-5 w-5 text-orange-500" />;
+      case 4: return <Award className="h-5 w-5 text-green-500" />; // A+ position
       default: return null;
     }
   };
@@ -69,121 +130,128 @@ const CarouselView = ({ onBack }: CarouselViewProps) => {
     }
   };
 
+  // Latest event and its top 3 winners (by position)
+  const latestEvent = [...events].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())[0];
+  const topWinners = latestEvent ? [...latestEvent.winners].sort((a, b) => a.position - b.position).slice(0, 3) : [];
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
-      {/* Header */}
-      <header className="bg-black/20 backdrop-blur-sm border-b border-white/10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center space-x-4">
-              <Button 
-                onClick={onBack}
-                variant="ghost"
-                className="text-white hover:bg-white/10"
-              >
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Back
-              </Button>
-              <div className="text-center">
-                <h1 className="text-4xl font-bold text-white mb-2">Cynosure 2025-'26</h1>
-                <p className="text-white/80">Cultural Event Results Showcase</p>
-              </div>
+    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 relative">
+      {/* Main Content - Split Layout */}
+      <div className="flex h-screen">
+        {/* Left Sidebar - School Standings (65%) */}
+        <div className="w-[65%] bg-black/10 backdrop-blur-sm border-r border-white/10 p-4 overflow-y-auto">
+          <div className="space-y-3">
+            {schoolsWithRanks.map((school) => {
+              const borderGradient = school.rank === 1
+                ? 'from-yellow-400 via-yellow-300 to-yellow-500'
+                : school.rank === 2
+                ? 'from-sky-400 via-indigo-400 to-sky-500'
+                : school.rank === 3
+                ? 'from-fuchsia-500 via-purple-500 to-orange-400'
+                : 'from-slate-600 to-slate-700';
+              return (
+                <div key={school.name} className={`rounded-xl p-[2px] bg-gradient-to-r ${borderGradient}`}>
+                  <div className="rounded-[10px] bg-black/40 px-4 py-3 flex items-center justify-between">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="h-8 w-8 rounded-full bg-white/10 flex items-center justify-center text-white font-bold text-sm shrink-0">
+                        {school.rank}
+                      </div>
+                      <div className="min-w-0">
+                        <div className="text-white font-semibold truncate">
+                          {school.name.length > 28 ? `${school.name.substring(0, 28)}...` : school.name}
+                        </div>
+                        <div className="text-white/60 text-xs">School</div>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-sky-300 text-2xl font-bold">{school.score}</div>
+                      <div className="text-white/60 text-xs">points</div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Right Panel - Top Winners (35%) */}
+        <div className="w-[35%] bg-black/5 backdrop-blur-sm p-4">
+          <div className="h-full flex flex-col relative">
+            <div className="flex-1 pt-16">
+              <Card className="bg-white/10 backdrop-blur-sm border-white/20 h-full">
+                <CardContent className="p-6 h-full">
+                  <h3 className="text-white text-xl font-bold mb-6">Top Winners</h3>
+                  {events.length > 0 ? (
+                    <Carousel className="w-full h-full" setApi={setApi} opts={{ loop: true, skipSnaps: false, dragFree: false }}>
+                      <CarouselContent className="h-full">
+                        {events.map((event) => (
+                          <CarouselItem key={event.id} className="h-full">
+                            <div className="h-full flex flex-col">
+                              <div className="text-center mb-4">
+                                <h4 className="text-white text-lg font-semibold">{event.name}</h4>
+                                <p className="text-white/70 text-sm">{event.category}</p>
+                              </div>
+                              <div className="flex-1 grid grid-cols-3 gap-4">
+                                {event.winners
+                                  .sort((a, b) => b.points - a.points)
+                                  .slice(0, 3)
+                                  .map((winner, index) => (
+                                    <div key={winner.position} className="text-center">
+                                      <div className="relative mx-auto mb-3 h-20 w-20 rounded-full overflow-hidden border-4 border-white/20 shadow-lg">
+                                        <img
+                                          src={winner.photo || '/placeholder.svg'}
+                                          alt={winner.name}
+                                          className="h-full w-full object-cover"
+                                          onError={(e) => {
+                                            const target = e.target as HTMLImageElement;
+                                            if (target.src !== '/placeholder.svg') target.src = '/placeholder.svg';
+                                          }}
+                                        />
+                                        <div className="absolute -top-2 -right-2 h-8 w-8 rounded-full bg-yellow-400 text-black font-bold flex items-center justify-center text-sm">
+                                          {winner.position === 1 ? '1' : winner.position === 2 ? '2' : winner.position === 3 ? '3' : 'A+'}
+                                        </div>
+                                      </div>
+                                      <div className="text-white font-semibold leading-tight truncate">{winner.name}</div>
+                                      <div className="text-white/70 text-xs truncate">{winner.school}</div>
+                                      <div className="text-sky-300 font-bold text-xl mt-1">{winner.points}</div>
+                                      <div className="text-white/60 text-xs">points</div>
+                                      <div className="mt-2 inline-block rounded-full px-3 py-1 text-[10px] font-bold bg-white/10 text-white border border-white/20">
+                                        {winner.position === 1 ? '1ST' : winner.position === 2 ? '2ND' : winner.position === 3 ? '3RD' : 'A+'}
+                                      </div>
+                                    </div>
+                                  ))}
+                              </div>
+                            </div>
+                          </CarouselItem>
+                        ))}
+                      </CarouselContent>
+                    </Carousel>
+                  ) : (
+                    <div className="h-full flex items-center justify-center text-white/70">No events yet</div>
+                  )}
+
+                  <div className="mt-6 w-full flex items-center justify-center text-white/70 text-sm">
+                    <Trophy className="h-6 w-6 text-white/60 mr-2" />
+                    Congratulations to our top performers!
+                  </div>
+                </CardContent>
+              </Card>
+
             </div>
           </div>
         </div>
-      </header>
-
-      {/* Live House Standings */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Card className="bg-white/10 backdrop-blur-sm border-white/20 mb-8">
-          <CardContent className="p-6">
-            <h2 className="text-2xl font-bold text-white mb-6 text-center">Live House Standings</h2>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              {sortedHouses.map((house, index) => (
-                <div 
-                  key={house.name}
-                  className="bg-white/20 backdrop-blur-sm rounded-lg p-4 text-center border border-white/30"
-                >
-                  <div className="flex items-center justify-center mb-2">
-                    {getRankIcon(index)}
-                    <span className="text-white font-semibold ml-2">#{index + 1}</span>
-                  </div>
-                  <h3 className="text-xl font-bold text-white mb-1">{house.name}</h3>
-                  <div className="text-3xl font-bold text-white">{house.score}</div>
-                  <p className="text-white/80 text-sm">points</p>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Event Results Carousel */}
-        <Card className="bg-white/10 backdrop-blur-sm border-white/20">
-          <CardContent className="p-8">
-            <h2 className="text-2xl font-bold text-white mb-6 text-center">Event Results</h2>
-            <Carousel className="w-full max-w-6xl mx-auto" setApi={setApi}>
-              <CarouselContent>
-                {events.map((event) => (
-                  <CarouselItem key={event.id}>
-                    <div className="p-6">
-                      <Card className="bg-white/20 backdrop-blur-sm border-white/30">
-                        <CardContent className="p-8">
-                          <div className="text-center mb-8">
-                            <h3 className="text-3xl font-bold text-white mb-2">{event.name}</h3>
-                            <p className="text-white/80 text-lg">
-                              {new Date(event.date).toLocaleDateString()} • {event.category} • {event.gradeLevel}
-                            </p>
-                          </div>
-                          
-                          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                            {event.winners.map((winner) => (
-                              <div 
-                                key={winner.position}
-                                className="bg-white/20 backdrop-blur-sm rounded-lg p-6 text-center border border-white/30"
-                              >
-                                <div className="flex items-center justify-center mb-6">
-                                  {getPositionIcon(winner.position)}
-                                  <span className="text-white font-bold ml-2 text-xl">
-                                    {winner.position === 1 ? '1st' : winner.position === 2 ? '2nd' : '3rd'} Place
-                                  </span>
-                                </div>
-                                
-                                <div className="mb-6">
-                                  <img 
-                                    src={winner.photo || '/placeholder.svg'} 
-                                    alt={winner.name}
-                                    className="w-48 h-48 object-cover rounded-lg mx-auto mb-6 border-4 border-white/30 shadow-2xl"
-                                    onError={(e) => {
-                                      // Fallback to placeholder if image fails to load
-                                      const target = e.target as HTMLImageElement;
-                                      if (target.src !== '/placeholder.svg') {
-                                        target.src = '/placeholder.svg';
-                                      }
-                                    }}
-                                  />
-                                  <h4 className="text-2xl font-bold text-white mb-3">{winner.name}</h4>
-                                  <div className="flex justify-center mb-3">
-                                    <span className={`px-4 py-2 rounded-full text-lg font-medium ${getHouseColor(winner.house)}`}>
-                                      {winner.house}
-                                    </span>
-                                  </div>
-                                  <div className="text-3xl font-bold text-white">{winner.points} pts</div>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        </CardContent>
-                      </Card>
-                    </div>
-                  </CarouselItem>
-                ))}
-              </CarouselContent>
-              <CarouselPrevious className="bg-white/20 backdrop-blur-sm border-white/30 text-white hover:bg-white/30" />
-              <CarouselNext className="bg-white/20 backdrop-blur-sm border-white/30 text-white hover:bg-white/30" />
-            </Carousel>
-          </CardContent>
-        </Card>
       </div>
+
+      {/* Back Button - Bottom Right */}
+      <Button 
+        onClick={onBack}
+        className="fixed bottom-6 right-6 text-white hover:text-white/80 z-50"
+        size="lg"
+        variant="ghost"
+      >
+        <ArrowLeft className="h-5 w-5 mr-2" />
+        Back
+      </Button>
     </div>
   );
 };

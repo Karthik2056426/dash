@@ -9,9 +9,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { ArrowLeft, Plus, Edit, Trash2, Save, Calendar, Trophy, Users, Settings, Upload, X } from 'lucide-react';
+import { ArrowLeft, Plus, Edit, Trash2, Save, Calendar, Trophy, Users, Settings, Upload, X, Award } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useEventContext, Event } from './EventContext';
+import cloudinaryConfig from '../lib/cloudinary';
 
 interface AdminDashboardProps {
   onBack: () => void;
@@ -19,7 +20,7 @@ interface AdminDashboardProps {
 
 interface Winner {
   position: number;
-  house: string;
+  school: string;
   name: string;
   points: number;
 }
@@ -34,6 +35,29 @@ interface EventResult {
 const AdminDashboard = ({ onBack }: AdminDashboardProps) => {
   const { toast } = useToast();
   const { events, addEvent, updateEvent, deleteEvent } = useEventContext();
+  
+  // Debug: Check environment variables
+  console.log('Environment variables check:');
+  console.log('VITE_CLOUDINARY_CLOUD_NAME:', import.meta.env.VITE_CLOUDINARY_CLOUD_NAME);
+  console.log('VITE_CLOUDINARY_UPLOAD_PRESET:', import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET);
+  
+  // Test Cloudinary connection
+  const testCloudinaryConnection = async () => {
+    try {
+      const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudinaryConfig.cloudName}/image/upload`, {
+        method: 'POST',
+        body: new FormData() // Empty form data to test connection
+      });
+      console.log('Cloudinary connection test:', response.status);
+    } catch (error) {
+      console.error('Cloudinary connection failed:', error);
+    }
+  };
+  
+  // Run connection test on component mount
+  useEffect(() => {
+    testCloudinaryConnection();
+  }, []);
   const [activeTab, setActiveTab] = useState('events');
   const [editingResult, setEditingResult] = useState<Event | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -41,22 +65,23 @@ const AdminDashboard = ({ onBack }: AdminDashboardProps) => {
   const selectedEvent = events.find(e => e.id === selectedEventId);
   // For resultWinners, always provide a 'photo' property (even if undefined)
   const [resultWinners, setResultWinners] = useState([
-    { position: 1, house: '', name: '', points: 10, photo: undefined },
-    { position: 2, house: '', name: '', points: 7, photo: undefined },
-    { position: 3, house: '', name: '', points: 5, photo: undefined }
+    { position: 1, school: '', name: '', points: 10, photo: undefined },
+    { position: 2, school: '', name: '', points: 7, photo: undefined },
+    { position: 3, school: '', name: '', points: 5, photo: undefined }
   ]);
 
   useEffect(() => {
     if (selectedEvent) {
       // Determine default points based on category
       const isGroup = selectedEvent.category === 'Group';
-      const defaultPoints = isGroup ? [20, 15, 10] : [10, 7, 5];
+      const defaultPoints = isGroup ? [10, 7, 5, 3] : [5, 3, 2, 1]; // Group: 10,7,5,3 | Individual: 5,3,2,1
       // If there are no winners, set defaults
       if (!selectedEvent.winners || selectedEvent.winners.length === 0) {
         setResultWinners([
-          { position: 1, house: '', name: '', points: defaultPoints[0], photo: undefined },
-          { position: 2, house: '', name: '', points: defaultPoints[1], photo: undefined },
-          { position: 3, house: '', name: '', points: defaultPoints[2], photo: undefined }
+        { position: 1, school: '', name: '', points: defaultPoints[0], photo: undefined },
+        { position: 2, school: '', name: '', points: defaultPoints[1], photo: undefined },
+        { position: 3, school: '', name: '', points: defaultPoints[2], photo: undefined },
+        { position: 4, school: '', name: '', points: defaultPoints[3], photo: undefined } // A+ position
         ]);
       } else {
         // If winners exist, keep their points, but for new added winners, use correct default
@@ -64,9 +89,10 @@ const AdminDashboard = ({ onBack }: AdminDashboardProps) => {
       }
     } else {
       setResultWinners([
-        { position: 1, house: '', name: '', points: 10, photo: undefined },
-        { position: 2, house: '', name: '', points: 7, photo: undefined },
-        { position: 3, house: '', name: '', points: 5, photo: undefined }
+        { position: 1, school: '', name: '', points: 5, photo: undefined },
+        { position: 2, school: '', name: '', points: 3, photo: undefined },
+        { position: 3, school: '', name: '', points: 2, photo: undefined },
+        { position: 4, school: '', name: '', points: 1, photo: undefined } // A+ position
       ]);
     }
   }, [selectedEvent]);
@@ -104,13 +130,28 @@ const AdminDashboard = ({ onBack }: AdminDashboardProps) => {
     date: '',
     category: '',
     gradeLevel: '',
-    venue: ''
+    venue: '',
+    chestNumber: ''
   });
   const [newWinners, setNewWinners] = useState([
-    { position: 1, house: '', name: '', points: 10, photo: undefined },
-    { position: 2, house: '', name: '', points: 7, photo: undefined },
-    { position: 3, house: '', name: '', points: 5, photo: undefined }
+    { position: 1, school: '', name: '', points: 5, photo: undefined },
+    { position: 2, school: '', name: '', points: 3, photo: undefined },
+    { position: 3, school: '', name: '', points: 2, photo: undefined },
+    { position: 4, school: '', name: '', points: 1, photo: undefined } // A+ position
   ]);
+
+  // Update default points when category changes
+  useEffect(() => {
+    const isGroup = newEvent.category === 'Group';
+    const defaultPoints = isGroup ? [10, 7, 5, 3] : [5, 3, 2, 1];
+    
+    setNewWinners([
+      { position: 1, school: '', name: '', points: defaultPoints[0], photo: undefined },
+      { position: 2, school: '', name: '', points: defaultPoints[1], photo: undefined },
+      { position: 3, school: '', name: '', points: defaultPoints[2], photo: undefined },
+      { position: 4, school: '', name: '', points: defaultPoints[3], photo: undefined }
+    ]);
+  }, [newEvent.category]);
 
   const handleAddEvent = () => {
     // Clean winners: remove undefined fields
@@ -137,11 +178,12 @@ const AdminDashboard = ({ onBack }: AdminDashboardProps) => {
       title: 'Event Added Successfully',
       description: `${newEvent.name} has been added to the system.`,
     });
-    setNewEvent({ name: '', description: '', date: '', category: '', gradeLevel: '', venue: '' });
+    setNewEvent({ name: '', description: '', date: '', category: '', gradeLevel: '', venue: '', chestNumber: '' });
     setNewWinners([
-      { position: 1, house: '', name: '', points: 10, photo: undefined },
-      { position: 2, house: '', name: '', points: 7, photo: undefined },
-      { position: 3, house: '', name: '', points: 5, photo: undefined }
+      { position: 1, school: '', name: '', points: 5, photo: undefined },
+      { position: 2, school: '', name: '', points: 3, photo: undefined },
+      { position: 3, school: '', name: '', points: 2, photo: undefined },
+      { position: 4, school: '', name: '', points: 1, photo: undefined } // A+ position
     ]);
   };
 
@@ -184,7 +226,7 @@ const AdminDashboard = ({ onBack }: AdminDashboardProps) => {
       'Event Name',
       'Event Date',
       'Winner Position',
-      'House',
+      'School',
       'Winner Name',
       'Points'
     ];
@@ -194,7 +236,7 @@ const AdminDashboard = ({ onBack }: AdminDashboardProps) => {
         event.name,
         event.date,
         winner.position,
-        winner.house,
+        winner.school,
         winner.name,
         winner.points
       ])
@@ -227,16 +269,61 @@ const AdminDashboard = ({ onBack }: AdminDashboardProps) => {
   const handleAddWinner = () => {
     if (!selectedEvent) return;
     const isGroup = selectedEvent.category === 'Group';
-    const defaultPoints = isGroup ? 20 : 10;
+    const defaultPoints = isGroup ? 10 : 5; // Group: 10 | Individual: 5
     setResultWinners([
       ...resultWinners,
-      { position: 1, house: '', name: '', points: defaultPoints, photo: undefined }
+      { position: 1, school: '', name: '', points: defaultPoints, photo: undefined }
     ]);
   };
 
   // Remove Winner handler
   const handleRemoveWinner = (index: number) => {
     setResultWinners(resultWinners.filter((_, i) => i !== index));
+  };
+
+  // Cloudinary upload function
+  const uploadToCloudinary = async (file: File): Promise<string> => {
+    console.log('Cloudinary Config:', cloudinaryConfig);
+    console.log('File to upload:', file.name, file.size, file.type);
+    
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', cloudinaryConfig.uploadPreset);
+    
+    const uploadUrl = `https://api.cloudinary.com/v1_1/${cloudinaryConfig.cloudName}/image/upload`;
+    console.log('Upload URL:', uploadUrl);
+    console.log('Upload Preset:', cloudinaryConfig.uploadPreset);
+    
+    try {
+      const response = await fetch(uploadUrl, {
+        method: 'POST',
+        body: formData,
+      });
+      
+      console.log('Response status:', response.status);
+      console.log('Response ok:', response.ok);
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Upload failed:', errorText);
+        
+        // Check for specific error messages
+        if (errorText.includes('Unknown API key')) {
+          throw new Error('Invalid Cloud Name. Please check your Cloudinary dashboard for the correct cloud name.');
+        } else if (errorText.includes('Invalid upload preset')) {
+          throw new Error('Invalid Upload Preset. Please check that "ASIC-EVENT" preset exists and is set to "Unsigned" in your Cloudinary dashboard.');
+        } else {
+          throw new Error(`Upload failed: ${response.status} - ${errorText}`);
+        }
+      }
+      
+      const data = await response.json();
+      console.log('Upload success:', data);
+      return data.secure_url;
+    } catch (error) {
+      console.error('Upload error:', error);
+      throw error;
+    }
   };
 
   return (
@@ -286,7 +373,7 @@ const AdminDashboard = ({ onBack }: AdminDashboardProps) => {
                   <Plus className="h-5 w-5" />
                   <span>Add New Event</span>
                 </CardTitle>
-                <CardDescription>Create a new cultural event for the school houses</CardDescription>
+                <CardDescription>Create a new cultural event for the schools</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -300,28 +387,17 @@ const AdminDashboard = ({ onBack }: AdminDashboardProps) => {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="eventDate">Date</Label>
+                    <Label htmlFor="chestNumber">Chest Number</Label>
                     <Input
-                      id="eventDate"
-                      type="date"
-                      value={newEvent.date}
-                      onChange={(e) => setNewEvent({...newEvent, date: e.target.value})}
+                      id="chestNumber"
+                      value={newEvent.chestNumber}
+                      onChange={(e) => setNewEvent({...newEvent, chestNumber: e.target.value})}
+                      placeholder="e.g., C001"
                     />
                   </div>
                 </div>
 
-                <div>
-                  <Label htmlFor="eventDescription">Description</Label>
-                  <Textarea
-                    id="eventDescription"
-                    value={newEvent.description}
-                    onChange={(e) => setNewEvent({...newEvent, description: e.target.value})}
-                    placeholder="Brief description of the event..."
-                    rows={3}
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <Label>Category</Label>
                     <Select value={newEvent.category} onValueChange={(value) => setNewEvent({...newEvent, category: value})}>
@@ -331,19 +407,6 @@ const AdminDashboard = ({ onBack }: AdminDashboardProps) => {
                       <SelectContent>
                         <SelectItem value="Individual">Individual</SelectItem>
                         <SelectItem value="Group">Group</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <Label>Grade Level</Label>
-                    <Select value={newEvent.gradeLevel} onValueChange={(value) => setNewEvent({...newEvent, gradeLevel: value})}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select grade" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="Junior">Junior (1-5)</SelectItem>
-                        <SelectItem value="Middle">Middle (6-8)</SelectItem>
-                        <SelectItem value="Senior">Senior (9-12)</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -372,9 +435,8 @@ const AdminDashboard = ({ onBack }: AdminDashboardProps) => {
                 <TableHeader>
                   <TableRow>
                     <TableHead>Name</TableHead>
-                    <TableHead>Date</TableHead>
+                    <TableHead>Chest Number</TableHead>
                     <TableHead>Category</TableHead>
-                    <TableHead>Grade</TableHead>
                     <TableHead>Venue</TableHead>
                     <TableHead>Actions</TableHead>
                   </TableRow>
@@ -383,9 +445,8 @@ const AdminDashboard = ({ onBack }: AdminDashboardProps) => {
                   {events.map(event => (
                     <TableRow key={event.id}>
                       <TableCell>{event.name}</TableCell>
-                      <TableCell>{new Date(event.date).toLocaleDateString()}</TableCell>
+                      <TableCell>{event.chestNumber}</TableCell>
                       <TableCell>{event.category}</TableCell>
-                      <TableCell>{event.gradeLevel}</TableCell>
                       <TableCell>{event.venue}</TableCell>
                       <TableCell>
                         <Button size="sm" variant="outline" onClick={() => deleteEvent(event.id)} className="text-red-600">Delete</Button>
@@ -405,7 +466,7 @@ const AdminDashboard = ({ onBack }: AdminDashboardProps) => {
                   <Trophy className="h-5 w-5" />
                   <span>Add Event Results</span>
                 </CardTitle>
-                <CardDescription>Record winners and update house scores with photos</CardDescription>
+                <CardDescription>Record winners and update school scores with photos</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div>
@@ -422,25 +483,26 @@ const AdminDashboard = ({ onBack }: AdminDashboardProps) => {
                   </Select>
                 </div>
                 {selectedEvent && (
-                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-6">
                     {resultWinners.map((winner, index) => (
                       <Card key={index} className="border-2 border-dashed relative">
-                        <CardHeader className="pb-3">
-                          <CardTitle className="text-lg flex items-center space-x-2">
+                      <CardHeader className="pb-3">
+                        <CardTitle className="text-lg flex items-center space-x-2">
                             {winner.position === 1 && <Trophy className="h-5 w-5 text-yellow-500" />}
                             {winner.position === 2 && <Trophy className="h-5 w-5 text-gray-400" />}
                             {winner.position === 3 && <Trophy className="h-5 w-5 text-orange-500" />}
-                            <span>{winner.position === 1 ? '1st' : winner.position === 2 ? '2nd' : winner.position === 3 ? '3rd' : `${winner.position}th`} Place</span>
-                          </CardTitle>
+                            {winner.position === 4 && <Award className="h-5 w-5 text-green-500" />}
+                            <span>{winner.position === 1 ? '1st' : winner.position === 2 ? '2nd' : winner.position === 3 ? '3rd' : winner.position === 4 ? 'A+' : `${winner.position}th`} Place</span>
+                        </CardTitle>
                           <Button type="button" size="icon" variant="ghost" className="absolute top-2 right-2" onClick={() => handleRemoveWinner(index)}>
                             <X className="h-4 w-4 text-red-500" />
                           </Button>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                          <div>
-                            <Label>Winner Photo</Label>
-                            {winner.photo ? (
-                              <div className="relative">
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        <div>
+                          <Label>Winner Photo</Label>
+                          {winner.photo ? (
+                            <div className="relative">
                                 <img 
                                   src={winner.photo} 
                                   alt="Winner preview" 
@@ -453,23 +515,23 @@ const AdminDashboard = ({ onBack }: AdminDashboardProps) => {
                                     }
                                   }}
                                 />
-                                <Button type="button" onClick={() => {
+                              <Button type="button" onClick={() => {
                                   const updated = [...resultWinners];
-                                  updated[index].photo = undefined;
+                                updated[index].photo = undefined;
                                   setResultWinners(updated);
-                                }} className="absolute top-2 right-2 h-6 w-6 p-0 bg-red-500 hover:bg-red-600">
-                                  <X className="h-3 w-3" />
-                                </Button>
-                              </div>
-                            ) : (
-                              <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
-                                <Upload className="h-8 w-8 mx-auto text-gray-400 mb-2" />
-                                <Input
-                                  type="file"
+                              }} className="absolute top-2 right-2 h-6 w-6 p-0 bg-red-500 hover:bg-red-600">
+                                <X className="h-3 w-3" />
+                              </Button>
+                            </div>
+                          ) : (
+                            <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
+                              <Upload className="h-8 w-8 mx-auto text-gray-400 mb-2" />
+                              <Input
+                                type="file"
                                   accept="image/*,.webp"
-                                  onChange={e => {
-                                    const file = e.target.files?.[0];
-                                    if (file) {
+                                  onChange={async (e) => {
+                                  const file = e.target.files?.[0];
+                                  if (file) {
                                       // Validate file type
                                       const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
                                       if (!validTypes.includes(file.type)) {
@@ -491,57 +553,74 @@ const AdminDashboard = ({ onBack }: AdminDashboardProps) => {
                                         return;
                                       }
                                       
-                                      const reader = new FileReader();
-                                      reader.onload = ev => {
+                                      try {
+                                        const uploadedUrl = await uploadToCloudinary(file);
                                         const updated = [...resultWinners];
-                                        updated[index].photo = ev.target?.result as string;
+                                        updated[index].photo = uploadedUrl;
                                         setResultWinners(updated);
-                                      };
-                                      reader.onerror = () => {
                                         toast({
-                                          title: "Error reading file",
-                                          description: "Failed to read the uploaded image. Please try again.",
+                                          title: "Image Uploaded",
+                                          description: "Photo uploaded successfully to Cloudinary.",
+                                        });
+                                      } catch (error) {
+                                        toast({
+                                          title: "Upload Failed",
+                                          description: "Failed to upload image. Please try again.",
                                           variant: "destructive",
                                         });
-                                      };
-                                      reader.readAsDataURL(file);
-                                    }
-                                  }}
-                                  className="hidden"
+                                      }
+                                  }
+                                }}
+                                className="hidden"
                                   id={`result-photo-${index}`} />
                                 <Label htmlFor={`result-photo-${index}`} className="cursor-pointer text-blue-600 hover:text-blue-700">
                                   Click to upload photo (JPEG, PNG, GIF, WebP - max 5MB)
-                                </Label>
-                              </div>
-                            )}
-                          </div>
-                          <div>
-                            <Label>House</Label>
-                            <Select value={winner.house} onValueChange={value => handleResultWinnerChange(index, 'house', value)}>
+                              </Label>
+                            </div>
+                          )}
+                        </div>
+                        <div>
+                          <Label>School</Label>
+                            <Select value={winner.school} onValueChange={value => handleResultWinnerChange(index, 'school', value)}>
                               <SelectTrigger>
-                                <SelectValue placeholder="Select house" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="Delany">Delany</SelectItem>
-                                <SelectItem value="Gandhi">Gandhi</SelectItem>
-                                <SelectItem value="Tagore">Tagore</SelectItem>
-                                <SelectItem value="Aloysius">Aloysius</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </div>
-                          <div>
-                            <Label>Winner Name</Label>
-                            <Input
-                              value={winner.name}
+                                <SelectValue placeholder="Select school" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="OUR LADY OF MERCY SCHOOL">OUR LADY OF MERCY SCHOOL</SelectItem>
+                                <SelectItem value="KRISTUJYOTHI INTERNATIONAL SCHOOL">KRISTUJYOTHI INTERNATIONAL SCHOOL</SelectItem>
+                                <SelectItem value="JEEVAS CMI CENTRAL SCHOOL ALUVA">JEEVAS CMI CENTRAL SCHOOL ALUVA</SelectItem>
+                                <SelectItem value="DON BOSCO CENTRAL SCHOOL ALUVA">DON BOSCO CENTRAL SCHOOL ALUVA</SelectItem>
+                                <SelectItem value="AUXILIUM SCHOOL KIDANGOOR, ANGAMALY">AUXILIUM SCHOOL KIDANGOOR, ANGAMALY</SelectItem>
+                                <SelectItem value="DON BOSCO SENIOR SECONDARY SCHOOL VADUTHALA">DON BOSCO SENIOR SECONDARY SCHOOL VADUTHALA</SelectItem>
+                                <SelectItem value="MAIRAM THRESIA PUBLIC SCHOOL">MAIRAM THRESIA PUBLIC SCHOOL</SelectItem>
+                                <SelectItem value="VIMALA CENTRAL SCHOOL PERUMBAVOOR">VIMALA CENTRAL SCHOOL PERUMBAVOOR</SelectItem>
+                                <SelectItem value="CHAVARA INTERNATIONAL VAZHAKULAM">CHAVARA INTERNATIONAL VAZHAKULAM</SelectItem>
+                                <SelectItem value="ANITA PUBLIC SCHOOL THANNIPUZHA">ANITA PUBLIC SCHOOL THANNIPUZHA</SelectItem>
+                                <SelectItem value="SEVENTH DAY ADVENTIST HIGHER SECONDARY SCHOOL KALOOR">SEVENTH DAY ADVENTIST HIGHER SECONDARY SCHOOL KALOOR</SelectItem>
+                                <SelectItem value="VIMALAGIRI INTERNATIONAL SCHOOL MUVATTUPUZHA">VIMALAGIRI INTERNATIONAL SCHOOL MUVATTUPUZHA</SelectItem>
+                                <SelectItem value="SANTHOME CENTRAL SCHOOL MOOKKANNOOR">SANTHOME CENTRAL SCHOOL MOOKKANNOOR</SelectItem>
+                                <SelectItem value="MARY WARD ENGLISH MEDIUM SCHOOL">MARY WARD ENGLISH MEDIUM SCHOOL</SelectItem>
+                                <SelectItem value="MAR ATHANASIUS INTERNATIONAL SCHOOL KOTHAMANGALAM">MAR ATHANASIUS INTERNATIONAL SCHOOL KOTHAMANGALAM</SelectItem>
+                                <SelectItem value="VIDYA VIKAS SCHOOL">VIDYA VIKAS SCHOOL</SelectItem>
+                                <SelectItem value="JNANODAYA CENTRAL SCHOOL">JNANODAYA CENTRAL SCHOOL</SelectItem>
+                                <SelectItem value="AUXILIUM ENGLISH MEDIUM SCHOOL">AUXILIUM ENGLISH MEDIUM SCHOOL</SelectItem>
+                                <SelectItem value="ST. PATRICKS ACADEMY">ST. PATRICKS ACADEMY</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div>
+                          <Label>Winner Name</Label>
+                          <Input
+                            value={winner.name}
                               onChange={e => handleResultWinnerChange(index, 'name', e.target.value)}
-                              placeholder="Enter name or team name"
-                            />
-                          </div>
-                          <div>
-                            <Label>Points</Label>
-                            <Input
-                              type="number"
-                              value={winner.points}
+                            placeholder="Enter name or team name"
+                          />
+                        </div>
+                        <div>
+                          <Label>Points</Label>
+                          <Input
+                            type="number"
+                            value={winner.points}
                               onChange={e => handleResultWinnerChange(index, 'points', parseInt(e.target.value))}
                             />
                           </div>
@@ -553,11 +632,11 @@ const AdminDashboard = ({ onBack }: AdminDashboardProps) => {
                               value={winner.position}
                               onChange={e => handleResultWinnerChange(index, 'position', parseInt(e.target.value))}
                               placeholder="Position"
-                            />
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
+                          />
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
                     <div className="flex items-center mt-4">
                       <Button type="button" variant="outline" onClick={handleAddWinner}>
                         <Plus className="h-4 w-4 mr-2" /> Add Winner
@@ -571,7 +650,7 @@ const AdminDashboard = ({ onBack }: AdminDashboardProps) => {
                       <Save className="h-4 w-4" />
                       <span>Save Results</span>
                     </Button>
-                  </div>
+                </div>
                 )}
               </CardContent>
             </Card>
@@ -604,7 +683,7 @@ const AdminDashboard = ({ onBack }: AdminDashboardProps) => {
                           <div className="flex flex-wrap gap-1">
                             {event.winners.map((winner, index) => (
                               <Badge key={index} variant="outline" className="text-xs">
-                                {index === 0 ? '🥇' : index === 1 ? '🥈' : '🥉'} {winner.house}
+                                {index === 0 ? '🥇' : index === 1 ? '🥈' : '🥉'} {winner.school}
                               </Badge>
                             ))}
                           </div>
@@ -656,7 +735,7 @@ const AdminDashboard = ({ onBack }: AdminDashboardProps) => {
                 
                 {editingResult && (
                   <div className="space-y-6">
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-6">
                       {editingResult.winners.map((winner, index) => (
                         <Card key={index} className="border-2 border-dashed">
                           <CardHeader className="pb-3">
@@ -664,30 +743,110 @@ const AdminDashboard = ({ onBack }: AdminDashboardProps) => {
                               {index === 0 && <Trophy className="h-5 w-5 text-yellow-500" />}
                               {index === 1 && <Trophy className="h-5 w-5 text-gray-400" />}
                               {index === 2 && <Trophy className="h-5 w-5 text-orange-500" />}
-                              <span>{index === 0 ? '1st' : index === 1 ? '2nd' : '3rd'} Place</span>
+                              {index === 3 && <Award className="h-5 w-5 text-green-500" />}
+                              <span>{index === 0 ? '1st' : index === 1 ? '2nd' : index === 2 ? '3rd' : 'A+'} Place</span>
                             </CardTitle>
                           </CardHeader>
                           <CardContent className="space-y-4">
                             {/* Photo Upload Section */}
                             <div>
                               <Label>Winner Photo</Label>
-                              {/* Removed photo preview and file upload logic */}
+                              {winner.photo ? (
+                                <div className="relative">
+                                  <img src={winner.photo} alt="Winner preview" className="w-full h-32 object-cover rounded-lg border" />
+                                  <Button 
+                                    type="button" 
+                                    onClick={() => updateEditingWinner(index, 'photo', '')} 
+                                    className="absolute top-2 right-2 h-6 w-6 p-0 bg-red-500 hover:bg-red-600"
+                                  >
+                                    <X className="h-3 w-3" />
+                                  </Button>
+                                </div>
+                              ) : (
+                                <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
+                                  <Upload className="h-8 w-8 mx-auto text-gray-400 mb-2" />
+                                  <Input
+                                    type="file"
+                                    accept="image/*,.webp"
+                                    onChange={async (e) => {
+                                      const file = e.target.files?.[0];
+                                      if (file) {
+                                        // Validate file type
+                                        const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+                                        if (!validTypes.includes(file.type)) {
+                                          toast({
+                                            title: "Invalid file type",
+                                            description: "Please upload a valid image file (JPEG, PNG, GIF, or WebP).",
+                                            variant: "destructive",
+                                          });
+                                          return;
+                                        }
+                                        
+                                        // Validate file size (max 5MB)
+                                        if (file.size > 5 * 1024 * 1024) {
+                                          toast({
+                                            title: "File too large",
+                                            description: "Please upload an image smaller than 5MB.",
+                                            variant: "destructive",
+                                          });
+                                          return;
+                                        }
+                                        
+                                        try {
+                                          const uploadedUrl = await uploadToCloudinary(file);
+                                          updateEditingWinner(index, 'photo', uploadedUrl);
+                                          toast({
+                                            title: "Image Uploaded",
+                                            description: "Photo uploaded successfully to Cloudinary.",
+                                          });
+                                        } catch (error) {
+                                          console.error('Upload error:', error);
+                                          toast({
+                                            title: "Upload Failed",
+                                            description: `Failed to upload image: ${error instanceof Error ? error.message : 'Unknown error'}`,
+                                            variant: "destructive",
+                                          });
+                                        }
+                                      }
+                                    }}
+                                    className="hidden"
+                                    id={`edit-photo-${index}`} />
+                                  <Label htmlFor={`edit-photo-${index}`} className="cursor-pointer text-blue-600 hover:text-blue-700">
+                                    Click to upload photo
+                                  </Label>
+                                </div>
+                              )}
                             </div>
 
                             <div>
-                              <Label>House</Label>
+                              <Label>School</Label>
                               <Select 
-                                value={winner.house} 
-                                onValueChange={(value) => updateEditingWinner(index, 'house', value)}
+                                value={winner.school} 
+                                onValueChange={(value) => updateEditingWinner(index, 'school', value)}
                               >
                                 <SelectTrigger>
-                                  <SelectValue placeholder="Select house" />
+                                  <SelectValue placeholder="Select school" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                  <SelectItem value="Delany">Delany</SelectItem>
-                                  <SelectItem value="Gandhi">Gandhi</SelectItem>
-                                  <SelectItem value="Tagore">Tagore</SelectItem>
-                                  <SelectItem value="Aloysius">Aloysius</SelectItem>
+                                  <SelectItem value="OUR LADY OF MERCY SCHOOL">OUR LADY OF MERCY SCHOOL</SelectItem>
+                                  <SelectItem value="KRISTUJYOTHI INTERNATIONAL SCHOOL">KRISTUJYOTHI INTERNATIONAL SCHOOL</SelectItem>
+                                  <SelectItem value="JEEVAS CMI CENTRAL SCHOOL ALUVA">JEEVAS CMI CENTRAL SCHOOL ALUVA</SelectItem>
+                                  <SelectItem value="DON BOSCO CENTRAL SCHOOL ALUVA">DON BOSCO CENTRAL SCHOOL ALUVA</SelectItem>
+                                  <SelectItem value="AUXILIUM SCHOOL KIDANGOOR, ANGAMALY">AUXILIUM SCHOOL KIDANGOOR, ANGAMALY</SelectItem>
+                                  <SelectItem value="DON BOSCO SENIOR SECONDARY SCHOOL VADUTHALA">DON BOSCO SENIOR SECONDARY SCHOOL VADUTHALA</SelectItem>
+                                  <SelectItem value="MAIRAM THRESIA PUBLIC SCHOOL">MAIRAM THRESIA PUBLIC SCHOOL</SelectItem>
+                                  <SelectItem value="VIMALA CENTRAL SCHOOL PERUMBAVOOR">VIMALA CENTRAL SCHOOL PERUMBAVOOR</SelectItem>
+                                  <SelectItem value="CHAVARA INTERNATIONAL VAZHAKULAM">CHAVARA INTERNATIONAL VAZHAKULAM</SelectItem>
+                                  <SelectItem value="ANITA PUBLIC SCHOOL THANNIPUZHA">ANITA PUBLIC SCHOOL THANNIPUZHA</SelectItem>
+                                  <SelectItem value="SEVENTH DAY ADVENTIST HIGHER SECONDARY SCHOOL KALOOR">SEVENTH DAY ADVENTIST HIGHER SECONDARY SCHOOL KALOOR</SelectItem>
+                                  <SelectItem value="VIMALAGIRI INTERNATIONAL SCHOOL MUVATTUPUZHA">VIMALAGIRI INTERNATIONAL SCHOOL MUVATTUPUZHA</SelectItem>
+                                  <SelectItem value="SANTHOME CENTRAL SCHOOL MOOKKANNOOR">SANTHOME CENTRAL SCHOOL MOOKKANNOOR</SelectItem>
+                                  <SelectItem value="MARY WARD ENGLISH MEDIUM SCHOOL">MARY WARD ENGLISH MEDIUM SCHOOL</SelectItem>
+                                  <SelectItem value="MAR ATHANASIUS INTERNATIONAL SCHOOL KOTHAMANGALAM">MAR ATHANASIUS INTERNATIONAL SCHOOL KOTHAMANGALAM</SelectItem>
+                                  <SelectItem value="VIDYA VIKAS SCHOOL">VIDYA VIKAS SCHOOL</SelectItem>
+                                  <SelectItem value="JNANODAYA CENTRAL SCHOOL">JNANODAYA CENTRAL SCHOOL</SelectItem>
+                                  <SelectItem value="AUXILIUM ENGLISH MEDIUM SCHOOL">AUXILIUM ENGLISH MEDIUM SCHOOL</SelectItem>
+                                  <SelectItem value="ST. PATRICKS ACADEMY">ST. PATRICKS ACADEMY</SelectItem>
                                 </SelectContent>
                               </Select>
                             </div>
