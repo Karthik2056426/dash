@@ -592,7 +592,7 @@ const AdminDashboard = ({ onBack }: AdminDashboardProps) => {
                                 <SelectItem value="DON BOSCO CENTRAL SCHOOL ALUVA">DON BOSCO CENTRAL SCHOOL ALUVA</SelectItem>
                                 <SelectItem value="AUXILIUM SCHOOL KIDANGOOR, ANGAMALY">AUXILIUM SCHOOL KIDANGOOR, ANGAMALY</SelectItem>
                                 <SelectItem value="DON BOSCO SENIOR SECONDARY SCHOOL VADUTHALA">DON BOSCO SENIOR SECONDARY SCHOOL VADUTHALA</SelectItem>
-                                <SelectItem value="MAIRAM THRESIA PUBLIC SCHOOL">MAIRAM THRESIA PUBLIC SCHOOL</SelectItem>
+                                <SelectItem value="MARIAM THRESIA PUBLIC SCHOOL">MARIAM THRESIA PUBLIC SCHOOL</SelectItem>
                                 <SelectItem value="VIMALA CENTRAL SCHOOL PERUMBAVOOR">VIMALA CENTRAL SCHOOL PERUMBAVOOR</SelectItem>
                                 <SelectItem value="CHAVARA INTERNATIONAL VAZHAKULAM">CHAVARA INTERNATIONAL VAZHAKULAM</SelectItem>
                                 <SelectItem value="ANITA PUBLIC SCHOOL THANNIPUZHA">ANITA PUBLIC SCHOOL THANNIPUZHA</SelectItem>
@@ -834,7 +834,7 @@ const AdminDashboard = ({ onBack }: AdminDashboardProps) => {
                                   <SelectItem value="DON BOSCO CENTRAL SCHOOL ALUVA">DON BOSCO CENTRAL SCHOOL ALUVA</SelectItem>
                                   <SelectItem value="AUXILIUM SCHOOL KIDANGOOR, ANGAMALY">AUXILIUM SCHOOL KIDANGOOR, ANGAMALY</SelectItem>
                                   <SelectItem value="DON BOSCO SENIOR SECONDARY SCHOOL VADUTHALA">DON BOSCO SENIOR SECONDARY SCHOOL VADUTHALA</SelectItem>
-                                  <SelectItem value="MAIRAM THRESIA PUBLIC SCHOOL">MAIRAM THRESIA PUBLIC SCHOOL</SelectItem>
+                                  <SelectItem value="MARIAM THRESIA PUBLIC SCHOOL">MARIAM THRESIA PUBLIC SCHOOL</SelectItem>
                                   <SelectItem value="VIMALA CENTRAL SCHOOL PERUMBAVOOR">VIMALA CENTRAL SCHOOL PERUMBAVOOR</SelectItem>
                                   <SelectItem value="CHAVARA INTERNATIONAL VAZHAKULAM">CHAVARA INTERNATIONAL VAZHAKULAM</SelectItem>
                                   <SelectItem value="ANITA PUBLIC SCHOOL THANNIPUZHA">ANITA PUBLIC SCHOOL THANNIPUZHA</SelectItem>
