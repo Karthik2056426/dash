@@ -6,31 +6,39 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Lock, User } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '@/lib/firebase';
 
 interface AdminLoginProps {
   onLogin: () => void;
 }
 
 const AdminLogin = ({ onLogin }: AdminLoginProps) => {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
     
-    if (username === 'admin' && password === 'patricks9520') {
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
       onLogin();
       toast({
         title: "Login Successful",
         description: "Welcome to the admin dashboard!",
       });
-    } else {
+    } catch (error: any) {
+      console.error('Login error:', error);
       toast({
         title: "Login Failed",
-        description: "Invalid username or password. Please try again.",
+        description: error.message || "Invalid email or password. Please try again.",
         variant: "destructive",
       });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -49,15 +57,15 @@ const AdminLogin = ({ onLogin }: AdminLoginProps) => {
         <CardContent>
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
-              <Label htmlFor="username">Username</Label>
+              <Label htmlFor="email">Email</Label>
               <div className="relative">
                 <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                 <Input
-                  id="username"
-                  type="text"
-                  placeholder="Enter username"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
+                  id="email"
+                  type="email"
+                  placeholder="Enter email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   className="pl-10"
                   required
                 />
@@ -78,13 +86,13 @@ const AdminLogin = ({ onLogin }: AdminLoginProps) => {
                 />
               </div>
             </div>
-            <Button type="submit" className="w-full">
-              Login
+            <Button type="submit" className="w-full" disabled={loading}>
+              {loading ? "Signing in..." : "Login"}
             </Button>
           </form>
           <div className="mt-4 text-center text-sm text-gray-600">
-            <p>Demo credentials:</p>
-            <p>Username: admin | Password: patricks9520</p>
+            <p>Use your Firebase Auth email and password</p>
+            <p>Make sure to enable Email/Password authentication in Firebase Console</p>
           </div>
         </CardContent>
       </Card>

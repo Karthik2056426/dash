@@ -177,6 +177,27 @@ const CarouselView = ({ onBack }: CarouselViewProps) => {
         {/* Right Panel - Top Winners (35%) */}
         <div className="w-[35%] bg-black/5 backdrop-blur-sm p-4">
           <div className="h-full flex flex-col relative">
+            {/* Logo images at the top */}
+            <div className="flex justify-between items-center mb-4">
+              <img 
+                src="/colablogo.png" 
+                alt="Colab Logo" 
+                className="h-24 w-auto opacity-80"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.style.display = 'none';
+                }}
+              />
+              <img 
+                src="/mainlogo.png" 
+                alt="Main Logo" 
+                className="h-24 w-auto opacity-80"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.style.display = 'none';
+                }}
+              />
+            </div>
             <div className="flex-1 pt-16">
               <Card className="bg-white/10 backdrop-blur-sm border-white/20 h-full">
                 <CardContent className="p-6 h-full">

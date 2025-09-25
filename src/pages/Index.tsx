@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Trophy, Users, Calendar, Award, BarChart3, Settings, Presentation } from 'lucide-react';
@@ -9,11 +9,24 @@ import AdminDashboard from '@/components/AdminDashboard';
 import AdminLogin from '@/components/AdminLogin';
 import CarouselView from '@/components/CarouselView';
 import { useEventContext } from '../components/EventContext';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
+import { auth } from '@/lib/firebase';
 
 const Index = () => {
   const [activeView, setActiveView] = useState<'public' | 'admin' | 'carousel' | 'login'>('public');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [loading, setLoading] = useState(true);
   const { events } = useEventContext();
+
+  // Check authentication state
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setIsAuthenticated(!!user);
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   // Calculate stats
   const totalEvents = events.length;
@@ -21,14 +34,14 @@ const Index = () => {
   const participants = Array.from(new Set(events.flatMap(e => e.winners.map(w => w.name)))).length;
   // Awards: total number of winner entries
   const awards = events.reduce((sum, e) => sum + e.winners.length, 0);
-  // Avg Score per house
-  const houseScores: Record<string, number> = {};
+  // Avg Score per school
+  const schoolScores: Record<string, number> = {};
   events.forEach(e => {
     e.winners.forEach(w => {
-      houseScores[w.house] = (houseScores[w.house] || 0) + w.points;
+      schoolScores[w.school] = (schoolScores[w.school] || 0) + w.points;
     });
   });
-  const avgScore = Object.values(houseScores).length > 0 ? Math.round(Object.values(houseScores).reduce((a, b) => a + b, 0) / Object.values(houseScores).length) : 0;
+  const avgScore = Object.values(schoolScores).length > 0 ? Math.round(Object.values(schoolScores).reduce((a, b) => a + b, 0) / Object.values(schoolScores).length) : 0;
 
   const handleAdminClick = () => {
     if (isAuthenticated) {
@@ -39,14 +52,28 @@ const Index = () => {
   };
 
   const handleLogin = () => {
-    setIsAuthenticated(true);
     setActiveView('admin');
   };
 
-  const handleLogout = () => {
-    setIsAuthenticated(false);
-    setActiveView('public');
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      setActiveView('public');
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (activeView === 'login') {
     return <AdminLogin onLogin={handleLogin} />;
