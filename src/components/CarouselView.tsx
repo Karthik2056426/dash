@@ -294,9 +294,6 @@ const CarouselView = ({ onBack }: CarouselViewProps) => {
                                             if (target.src !== '/placeholder.svg') target.src = '/placeholder.svg';
                                           }}
                                         />
-                                        <div className="absolute -top-2 -right-2 h-8 w-8 rounded-full bg-yellow-400 text-black font-bold flex items-center justify-center text-sm">
-                                          {winner.position === 1 ? '1' : winner.position === 2 ? '2' : winner.position === 3 ? '3' : 'A+'}
-                                        </div>
                                       </div>
                                       <div className="text-white font-semibold leading-tight truncate">{winner.name}</div>
                                       <div className="text-white/70 text-xs truncate">{winner.school}</div>
